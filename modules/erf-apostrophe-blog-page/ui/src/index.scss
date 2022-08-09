@@ -1,0 +1,56 @@
+.social-button {
+    height: 2rem;
+    display: inline-block;
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+    path {
+        fill: var(--a-primary);
+    }
+    &.linear {
+        path {
+            fill: transparent;
+            stroke: var(--a-primary);
+            stroke: 15;
+        }
+    }
+    &.social-button__fb.solid{
+        path {
+            fill: #4267B2;
+        }
+    }
+    &.social-button__tw.solid{
+        path {
+            fill: #1DA1F2;
+        }
+    }
+    &.social-button__re.solid{
+        path {
+            fill: #FF4500;
+        }
+    }
+    &.social-button__fb.linear{
+        path {
+            fill: transparent;
+            stroke: #4267B2;
+            stroke-width: 15;
+        }
+    }
+    &.social-button__tw.linear{
+        path {
+            fill: transparent;
+            stroke: #1DA1F2;
+            stroke-width: 15;
+        }
+    }
+    &.social-button__re.linear{
+        path {
+            fill: transparent;
+            stroke: #FF4500;
+            stroke-width: 15;
+        }
+    }
+}
+
+

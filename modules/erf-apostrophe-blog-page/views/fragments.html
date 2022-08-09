@@ -1,0 +1,17 @@
+{% fragment thumbnails(pieces) %}
+    {% for piece in pieces %}
+    <h2><a href="{{ piece._url }}">{{ piece.title }}</a></h2>
+    <p>This is from a thumbnails template</p>
+    {% endfor %}
+{% endfragment %}
+
+{% fragment list(pieces) %}
+    {% for piece in pieces %}
+    <h2><a href="{{ piece._url }}">{{ piece.title }}</a></h2>
+    <p>This is from a list template</p>
+    {% endfor %}
+{% endfragment %}
+
+{% fragment default(pieces) %}
+    {% render thumbnails(pieces) %}
+{% endfragment %}

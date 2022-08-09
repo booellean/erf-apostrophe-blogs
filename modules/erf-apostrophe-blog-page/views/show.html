@@ -1,0 +1,49 @@
+{% set bannerObject = apos.attachment.first(data.piece._banner) %}
+{% set srcset = apos.image.srcset(bannerObject) %}
+
+{% block startHead %}
+{% component 'erf-apostrophe-blog-page:ogTagsShow' %}
+{% endblock %}
+
+{% extends data.outerLayout %}
+{% block title %}{{ data.piece.title }}{% endblock %}
+
+{% block main %}
+<img srcset="{{ srcset }}" src="{{ apos.attachment.url(bannerObject) }}" alt="{{bannerObject._alt}}" />
+<h2>{{ data.piece.title }}</h2>
+{% area data.piece, 'erf_main_content' %}
+{% set tags = []%}
+<div id="tags" data-tags="{{data.piece._tags|join(',', 'slug')}}">
+{% for tag in data.piece._tags|sort(false, true, 'slug') %}
+{# TODO: actually put query url in place #}
+    <a href="{{ data.page._url | build({ tags: tag.slug }) }}">{{tag.title}}</a><br>
+    {% set tags = (tags.push(tag.slug), tags) %}
+{% endfor %}
+</div>
+
+<!-- TODO move to css widget -->
+<style>
+.share-btn > a {
+    border: 1px solid #ccc;
+    padding: 5px;
+    font-size: 12px;
+    font-family: Verdana, Arial;
+}
+.share-btn > a:hover {
+    cursor: pointer;
+}
+.share-btn > a > span.social-button > svg {
+    height: 1rem;
+}
+</style>
+
+<div id="share-links-container"></div>
+
+<script type="application/javascript">
+    window.ArticleSettings = {{ data.articleSettings | dump | safe }};
+    window.ArticleSettings.moreUrl = "{{ data.page._url }}";
+    window.shareDiv = document.querySelector('#share-links-container');
+</script>
+<script src="{{ apos.asset.url('/modules/erf-apostrophe-blog-page/share-links.js') }}"></script>
+
+{% endblock %}

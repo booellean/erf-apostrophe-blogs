@@ -1,0 +1,13 @@
+{
+  "name": "erf-apostrophe-blogs",
+  "version": "1.0.0",
+  "description": "A blogging platform for content managers",
+  "main": "index.js",
+  "author": "Elliot 'booellean' Forst",
+  "devDependencies": {
+    "apostrophe": "^3.1.1"
+  },
+  "dependencies": {
+    "share-buttons": "^1.9.0"
+  }
+}

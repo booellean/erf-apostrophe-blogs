@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block startHead %}
+{% if data.piece.visibleOnListing %}
+    {% if data.piece.firstName %}
+    <meta property="profile:first_name" content="{{data.piece.firstName}}">
+    {% endif %}
+    {% if data.piece.lastName %}
+    <meta property="profile:last_name" content="{{data.piece.lastName}}">
+    {% endif %}
+    {% if data.piece.gender %}
+    <meta property="profile:gender" content="{{data.piece.gender}}">
+    {% endif %}
+    {% if data.piece.username %}
+    <meta property="profile:username" content="{{data.piece.username}}">
+    {% endif %}
+{% endif %}
+{% endblock %}

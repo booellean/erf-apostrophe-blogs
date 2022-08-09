@@ -1,0 +1,25 @@
+{% set previewImage = apos.attachment.first(data.articleSettings.previewImage.data) %}
+
+<meta property="og:title" content="{{data.articleSettings.blogTitle.data}}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="{{data.articleSettings.siteName.data}}" />
+<meta property="og:description" content="{{data.articleSettings.blogDescription.data}}" />
+<meta property="og:determiner" content="" />
+<!-- TODO: build component to get localize name with data locale -->
+<meta property="og:locale" content="{{data.locale}}" />
+<!-- <meta property="og:locale:alternate" content="fr_FR" />
+<meta property="og:locale:alternate" content="es_ES" /> -->
+
+<meta property="og:image" content="{{ data.baseUrl+ apos.attachment.url(previewImage, { size: 'full' }) }}" />
+<meta property="og:image:type" content="image/{{previewImage.extension}}" />
+<meta property="og:image:width" content="{{previewImage.width}}" />
+<meta property="og:image:height" content="{{previewImage.height}}" />
+<meta property="og:image:alt" content="{{previewImage._alt}}" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<!-- TODO: include an author profile page with twitter url -->
+<!-- <meta name="twitter:site" content="@flickr" /> -->
+<meta name="twitter:title" content="{{data.articleSettings.blogTitle.data}}" />
+<meta name="twitter:description" content="{{data.articleSettings.blogDescription.data}}" />
+<meta name="twitter:image" content="{{ data.baseUrl+ apos.attachment.url(previewImage, { size: 'full' }) }}" />
+<meta name="twitter:image:alt" content="{{previewImage._alt}}" />

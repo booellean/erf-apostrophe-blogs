@@ -1,0 +1,36 @@
+{% set bannerObject = apos.attachment.first(data.piece._banner) %}
+{% set category = data.piece._category[0] %}
+
+<meta property="og:title" content="{{data.piece.title}}" />
+<meta property="og:type" content="article" />
+
+<meta property="og:url" content="{{ data.baseUrl+data.absoluteUrl }}" />
+<meta property="og:site_name" content="{{data.articleSettings.siteName.data}}" />
+<meta property="og:description" content="{{data.piece.description}}" />
+<meta property="og:determiner" content="" />
+<!-- TODO: build component to get localize name with data locale -->
+<meta property="og:locale" content="{{data.locale}}" />
+<!-- <meta property="og:locale:alternate" content="fr_FR" />
+<meta property="og:locale:alternate" content="es_ES" /> -->
+<!-- TODO: website name settings -->
+
+<meta property="og:image" content="{{ data.baseUrl+ apos.attachment.url(bannerObject, { size: 'full' }) }}" />
+<meta property="og:image:type" content="image/{{bannerObject.extension}}" />
+<meta property="og:image:width" content="{{bannerObject.width}}" />
+<meta property="og:image:height" content="{{bannerObject.height}}" />
+<meta property="og:image:alt" content="{{bannerObject._alt}}" />
+
+<meta property="article:published_time" content="{{data.piece.createdAt|date('YYYY-MM-DDTHH:MM:SSZ')}}" /> <!-- - datetime - When the article was first published.-->
+<meta property="article:modified_time" content="{{data.piece.updatedAt|date('YYYY-MM-DDTHH:MM:SSZ')}}" /> <!-- - datetime - When the article was last changed.-->
+<!-- TODO: include only if the author has a profile page -->
+<!-- <meta property="article:author" content="" /> -->
+<meta property="article:section" content="{{ category.title }}" /> 
+<meta property="article:tag" content="{{ data.piece._tags|join(',', 'slug')}}" /> <!-- - string array - Tag words associated with this article.-->
+
+<meta name="twitter:card" content="summary_large_image" />
+<!-- TODO: include an author profile page with twitter url -->
+<!-- <meta name="twitter:site" content="@flickr" /> -->
+<meta name="twitter:title" content="{{data.piece.title}}" />
+<meta name="twitter:description" content="{{data.piece.description}}" />
+<meta name="twitter:image" content="{{ data.baseUrl+apos.attachment.url(bannerObject, { size: 'full' }) }}" />
+<meta name="twitter:image:alt" content="{{bannerObject._alt}}" />
