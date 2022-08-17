@@ -20,5 +20,24 @@ module.exports = {
                 type: 'erf-apostrophe-blog-user-page'
             })
         }
+    },
+    components(self) {
+        return {
+          async profileLink(req, data) {
+                return { user: data.user || {}, prefix: self.options.prefix }
+          }
+        }
+    },
+    extendMethods(self){
+        return {
+            async beforeShow(_super, req) {
+                console.log('this was reading', req.data)
+                if( req.data.piece && !req.data.piece.visibleOnListing){
+                    // return a 404 not found if the user wants to be unlisted
+                    req.notFound = true;
+                }
+                return req
+            }
+        }
     }
 }

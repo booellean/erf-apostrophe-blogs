@@ -1,49 +1,77 @@
+{% extends "layout.html" %}
+
+{% set settings = data.articleSettings %}
 {% set bannerObject = apos.attachment.first(data.piece._banner) %}
-{% set srcset = apos.image.srcset(bannerObject) %}
+{% set author = data.piece._author[0] or { title: settings.siteName.data, _profileImage: settings.previewImage.data, description: settings.blogDescription.data } %}
+{% set authorProfileImage = apos.attachment.first(author._profileImage) %}
+{% set bannerObjectSrcset = apos.image.srcset(bannerObject) %}
+{% set authorProfileImageSrcset = apos.image.srcset(authorProfileImage) %}
+{% set webImageObject = apos.attachment.first(settings.previewImage.data) %}
+{% set websiteImageSrcset = apos.image.srcset(authorProfileImage) %}
+{% set publishDate = data.piece.createdAt %}
 
 {% block startHead %}
 {% component 'erf-apostrophe-blog-page:ogTagsShow' %}
 {% endblock %}
 
-{% extends data.outerLayout %}
-{% block title %}{{ data.piece.title }}{% endblock %}
+{% set title =  settings.blogTitle.data if settings.blogTitle.data else '' %}
+{% set title = title + ' - ' if settings.blogTitle.data and (data.piece.title or data.page.title) %}
+{% set title = title +(data.piece.title or data.page.title) %}
+
+{% block title %}{{title}}{% endblock %}
 
 {% block main %}
-<img srcset="{{ srcset }}" src="{{ apos.attachment.url(bannerObject) }}" alt="{{bannerObject._alt}}" />
-<h2>{{ data.piece.title }}</h2>
-{% area data.piece, 'erf_main_content' %}
-{% set tags = []%}
-<div id="tags" data-tags="{{data.piece._tags|join(',', 'slug')}}">
-{% for tag in data.piece._tags|sort(false, true, 'slug') %}
-{# TODO: actually put query url in place #}
-    <a href="{{ data.page._url | build({ tags: tag.slug }) }}">{{tag.title}}</a><br>
-    {% set tags = (tags.push(tag.slug), tags) %}
-{% endfor %}
+{{ data.articleSettings | dump}}
+{{ author | dump}}
+<div class="article-layout">
+    {% block authorAside %}
+    <aside class="author-info">
+        {% block author %}
+            <figure>
+                {% if author.gravatarUrl %}
+                <img srcset="{{author.gravatarUrl}}?s=1200 1000w, {{author.gravatarUrl}}?s=1000 760w, {{author.gravatarUrl}}?s=800 570w, {{author.gravatarUrl}}?s=620 380w, {{author.gravatarUrl}}?s=250 190w" src="{{author.gravatarUrl}}" alt="Author Profile Image" />
+                {% elif authorProfileImage %}
+                <img srcset="{{ authorProfileImageSrcset }}" src="{{ apos.attachment.url(authorProfileImage) }}" alt="{{authorProfileImage._alt}}" />
+                {% elif webImageObject %}
+                <img srcset="{{ websiteImageSrcset }}" src="{{ apos.attachment.url(webImageObject) }}" alt="{{webImageObject._alt}}" />
+                {% endif %}
+                <figcaption>
+                    <div class="author__title">{{ author.title }}</div>
+                    {% if author.blurb %}
+                    <div class="author_blurb">{{ author.blurb }}</div>
+                    {% endif %}
+                </figcaption>
+            </figure>
+        {% endblock %}
+    </aside>
+    {% endblock %}
+    <article class="entry">
+        <h1>{{ data.piece.title }}</h1>
+        <time datetime="{{publishDate|date()}}" title="{{ publishDate | date('dddd, MMMM D YYYY, h:mm a')}}">{{ publishDate | date('MMMM D, YYYY') }}</time>
+        {% if bannerObject %}
+        <div id="banner">
+            <img srcset="{{ bannerObjectSrcset }}" src="{{ apos.attachment.url(bannerObject) }}" alt="{{bannerObject._alt}}" />
+        </div>
+        {% endif %}
+        {% area data.piece, 'erf_main_content' %}
+        {% set tags = []%}
+        <div id="tags" data-tags="{{data.piece._tags|join(',', 'slug')}}">
+        {% for tag in data.piece._tags|sort(false, true, 'slug') %}
+        {# TODO: actually put query url in place #}
+            <a href="{{ data.page._url | build({ tags: tag.slug }) }}">{{tag.slug | replace("-", " ")}}</a><br>
+            {% set tags = (tags.push(tag.slug), tags) %}
+        {% endfor %}
+        </div>
+
+        <div id="share-links-container"></div>
+    </article>
 </div>
-
-<!-- TODO move to css widget -->
-<style>
-.share-btn > a {
-    border: 1px solid #ccc;
-    padding: 5px;
-    font-size: 12px;
-    font-family: Verdana, Arial;
-}
-.share-btn > a:hover {
-    cursor: pointer;
-}
-.share-btn > a > span.social-button > svg {
-    height: 1rem;
-}
-</style>
-
-<div id="share-links-container"></div>
 
 <script type="application/javascript">
     window.ArticleSettings = {{ data.articleSettings | dump | safe }};
     window.ArticleSettings.moreUrl = "{{ data.page._url }}";
     window.shareDiv = document.querySelector('#share-links-container');
 </script>
-<script src="{{ apos.asset.url('/modules/erf-apostrophe-blog-page/share-links.js') }}"></script>
+<!-- <script src="{{ apos.asset.url('/modules/erf-apostrophe-blog-page/share-links.js') }}"></script> -->
 
 {% endblock %}

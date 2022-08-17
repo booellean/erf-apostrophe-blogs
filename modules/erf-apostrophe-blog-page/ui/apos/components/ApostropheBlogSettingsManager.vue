@@ -156,17 +156,18 @@ export default {
             if(type === 'template') return this.generateTemplatePreview()
         },
         generateSocialPreview(){
-            let data = '';
+            let data = '<div class="social-icons-preview">';
             for(let i = 0; i < this.settingsValues.socialMediaChoices.data.length; i++){
                 let choice = this.settingsValues.socialMediaChoices.data[i];
                 let classColor = this.settingsValues.socialMediaColors.data === 'og' ? 'social-button__'+choice : ''
                 let classFill = this.settingsValues.socialMediaFill.data
                 let classStyle = this.settingsValues.socialMediaStyle.data === 'inverted' ? 'inverted' : ''
                 data += `
-                <span class="social-button ${classColor} ${classFill} ${classStyle}">
-                    ${this.icons[choice]}
+                <span class="social-button ${classColor} ${classStyle}">
+                    ${this.icons[classFill][choice]}
                 </span>`
             }
+            data += '</div>';
             return data;
         },
         generateTemplatePreview(){
@@ -176,32 +177,96 @@ export default {
 }
 </script>
 <style>
-    div.article-preview {
-        width: 100%;
-        height: 10em;
+    .apos-field {
+        padding: 1rem 0 !important;
+    }
+    div.social-icons-preview {
         display: flex;
+        flex-flow: column nowrap;
+        align-items: flex-end;
+    }
+    div.article-preview {
+        display: flex;
+        min-height: 10rem;
     }
     div.article-preview.article-thumbnails {
-        flex-flow: column wrap;
+        flex-flow: row wrap;
     }
     div.article-preview.article-thumbnails > div.article-thumb {
+        display: flex;
+        flex-flow: column nowrap;
         width: 4rem;
         height: 4rem;
     }
     div.article-preview.article-list {
+        width: 100%;
         flex-flow: column nowrap;
     }
 
     div.article-preview.article-list > div.article-list-item {
         width: 100%;
-        height: 10rem;
+        height: 2rem;
+        display: flex;
+        overflow: hidden;
     }
-    div.article-preview > div {
-        background-color: blue;
-        border-radius: 0.4rem;
+    .svg-container {
+        height: inherit;
+        box-sizing: border-box;
+        padding: 0.5rem;
+        background: #62a9e0;
+    }
+    .svg-container > svg {
+        width: 100%;
+        height: 100%;
+    }
+    .list.svg-container {
+        width: 2rem;
+    }
+    .list.content-container {
+        width: 100%;
+        display: flex;
+        flex-flow: column nowrap;
         margin: 0.5rem;
     }
-
+    .thumb.content-container {
+        display: flex;
+        flex-flow: column nowrap;
+        justify-content: space-around;
+        height: 100%;
+        padding: 0.25rem;
+    }
+    .thumb.svg-container {
+        height: 70%;
+    }
+    .content-container > div {
+        background: #62a9e0;
+        box-sizing: border-box;
+    }
+    .list.content-container > .title-mock {
+        width: 30%;
+        height: 0.7rem;
+        margin: 0.1rem 0;
+    }
+    .list.content-container > .description-mock {
+        margin: 0.1rem 0;
+        height: 0.7rem;
+    }
+    .thumb.content-container > .title-mock {
+        width: 63%;
+        height: 0.2rem;
+    }
+    .thumb.content-container > .description-mock {
+        height: 0.2rem;
+    }
+    .svg-container > svg > path {
+        fill: #fff4dd;
+    }
+    div.article-preview > div {
+        background-color: #fff4dd;
+        border-radius: 0.4rem;
+        margin: 0.5rem;
+        overflow: hidden;
+    }
     .settings-group{
         padding: 2rem;
     }

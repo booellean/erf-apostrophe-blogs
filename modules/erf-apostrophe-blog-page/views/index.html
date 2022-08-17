@@ -1,12 +1,12 @@
 {% import 'fragments.html' as layouts %}
 {% extends "layout.html" %}
 
-{% block startHead %}
-{% component 'erf-apostrophe-blog-page:ogTagsIndex' %}
-{% endblock %}
+{% set settings = data.articleSettings %}
+{% set title =  settings.blogTitle.data if settings.blogTitle.data else '' %}
+{% set title = title + ' - ' if settings.blogTitle.data and (data.piece.title or data.page.title) %}
+{% set title = title +(data.piece.title or data.page.title) %}
 
-{% extends data.outerLayout %}
-{% block title %}{{ data.page.title }}{% endblock %}
+{% block title %}{{title}}{% endblock %}
 
 {% block main %}
   {% set indexTemplateView = data.articleSettings.indexTemplate.data %}

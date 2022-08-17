@@ -81,16 +81,41 @@ module.exports = {
                     highSearchWords: 1,
                   },
                 }
+            },
+            _author: {
+              type: 'relationship',
+              label: 'Entry Author',
+              help: 'Leave blank to autosync to current user.',
+              withType: '@apostrophecms/user',
+              max: 1,
+              withRelationships: [ '_profileImage' ]
             }
         },
         group: {
           basics: {
             label: 'Content',
             fields: [
-              'title', '_category', '_banner', 'erf_main_content', '_tags'
+              'title', 'description', '_category', '_banner', 'erf_main_content', '_tags'
             ]
           },
+          utility: {
+            fields: ['_author']
+          }
         }
+    },
+    handlers(self){
+      return{
+        beforeSave: {
+          syncAuthor(req, doc, options) {
+            if(doc._author.length < 1){
+              doc._author =[req.user]
+              doc.authorIds =[req.user.aposDocId]
+              doc.authorFields = {}
+              doc.authorFields[req.user.aposDocId] = {}
+            }
+          }
+        }
+      }
     }
 }
 

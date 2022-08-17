@@ -12,6 +12,22 @@ module.exports = {
                     },
                     def: false
                 },
+                description: {
+                    type: 'string',
+                    label: 'Description',
+                    help: 'A Description introducing yourself, shown under your articles.',
+                    required: false,
+                    textarea: true,
+                    max: 800
+                },
+                blurb: {
+                    type: 'string',
+                    label: 'Blurb',
+                    help: 'A brief blurb about yourself, shown under your profile picture.',
+                    required: false,
+                    textarea: true,
+                    max: 230
+                },
                 firstName: {
                     type: 'string',
                     label: 'First Name',
@@ -52,7 +68,7 @@ module.exports = {
                       true: 'Allow',
                       false: 'Disable'
                     },
-                    def: true
+                    def: false
                 },
             },
             group: {
@@ -66,11 +82,13 @@ module.exports = {
                   ]
                 },
                 profile: {
-                  label: 'Profile for SEO',
+                  label: 'Profile (SEO)',
                   fields: [
                     'twitterHandle',
                     'gravatarUrl',
-                    '_profileImage'
+                    '_profileImage',
+                    'blurb',
+                    'description'
                   ]
                 },
                 utility: {
@@ -88,14 +106,6 @@ module.exports = {
     },
     handlers(self){
         return {
-            'apostrophe:ready': {
-                addToProfile() {
-                  if(self.apos.modules['erf-apostrophe-blog-user-page']){
-                    self.addUrlPropertyToUser()
-                    self.addPagePreviewToManager()
-                  }
-                }
-            },
             beforeSave: {
                 async keepTwitterHandleStandard(req, doc){
                     doc.twitterHandle = doc.twitterHandle.replace(/@/g, "");
