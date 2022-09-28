@@ -287,6 +287,7 @@ const defaultSettings = {
         },
         indexTemplate: {
             label: "Template type for showing all items.",
+            help: '',
             type: 'radio',
             choices: [
                 {
@@ -346,6 +347,7 @@ const defaultSettings = {
         },
         socialMediaFill: {
             label: 'Fill of Icons',
+            help: '',
             type: 'radio',
             choices: [
                 {
@@ -361,6 +363,7 @@ const defaultSettings = {
         },
         socialMediaStyle: {
             label: 'Fill Location',
+            help: '',
             type: 'radio',
             choices: [
                 {

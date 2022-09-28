@@ -39,7 +39,7 @@
                                 <div v-for="schemaName in group.items" :key="'schema-'+schemaName">
                                     <component
                                         v-for="schema in settingsSchema.filter( s => s.name === schemaName)"
-                                        :key="'schema-'+schemaName+'loop'"
+                                        :key="'schema-'+schemaName+'-loop'"
                                         v-model="settingsValues[schemaName]"
                                         :is="fieldComponentMap[schema.type]"
                                         :field="schema"
@@ -117,9 +117,16 @@ export default {
         this.modal.active = true;
         console.log('props...', this.$props, this.$data)
         await this.getCurrentSettings();
-        window.apos.bus.$on('content-changed', this.onContentChanged);
+        // window.apos.bus.$on('content-changed', this.onContentChanged);
+    },
+    destroyed() {
+        window.apos.bus.$off('content-changed', this.onContentChanged);
     },
     methods: {
+        // async onContentChanged() {
+        //     // TODO: freeze this until editing is done...?
+        //     console.log('the content changed')
+        // },
         async getCurrentSettings(){
             await window.apos.http.get(this.saveRoute, { busy: true })
                 .then( res => {

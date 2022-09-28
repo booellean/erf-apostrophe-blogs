@@ -8,7 +8,7 @@
 {% set authorProfileImageSrcset = apos.image.srcset(authorProfileImage) %}
 {% set webImageObject = apos.attachment.first(settings.previewImage.data) %}
 {% set websiteImageSrcset = apos.image.srcset(authorProfileImage) %}
-{% set publishDate = data.piece.createdAt %}
+{% set publishDate = data.piece.publishDate %}
 
 {% block startHead %}
 {% component 'erf-apostrophe-blog-page:ogTagsShow' %}
@@ -21,11 +21,16 @@
 {% block title %}{{title}}{% endblock %}
 
 {% block main %}
-{{ data.articleSettings | dump}}
-{{ author | dump}}
-<div class="article-layout">
+<div class="article-layout row">
     {% block authorAside %}
-    <aside class="author-info">
+    <aside class="
+        author-info
+        col-xs-12
+        col-sm-4
+        last-xs
+        first-sm
+    ">
+        <div class="sticky">
         {% block author %}
             <figure>
                 {% if author.gravatarUrl %}
@@ -43,11 +48,16 @@
                 </figcaption>
             </figure>
         {% endblock %}
+        </div>
     </aside>
     {% endblock %}
-    <article class="entry">
+    <article class="
+        entry
+        col-xs-12
+        col-sm-8
+    " data-entry="article">
         <h1>{{ data.piece.title }}</h1>
-        <time datetime="{{publishDate|date()}}" title="{{ publishDate | date('dddd, MMMM D YYYY, h:mm a')}}">{{ publishDate | date('MMMM D, YYYY') }}</time>
+        <time datetime="{{publishDate|date()}}" title="{{ publishDate | date('dddd, MMMM D YYYY, h:mm a')}}" id="publish-date" class="blog-entry-field">{{ publishDate | date('MMMM D, YYYY') }}</time>
         {% if bannerObject %}
         <div id="banner">
             <img srcset="{{ bannerObjectSrcset }}" src="{{ apos.attachment.url(bannerObject) }}" alt="{{bannerObject._alt}}" />
@@ -55,22 +65,21 @@
         {% endif %}
         {% area data.piece, 'erf_main_content' %}
         {% set tags = []%}
-        <div id="tags" data-tags="{{data.piece._tags|join(',', 'slug')}}">
+        <div id="tags" data-tags="{{data.piece._tags|join(',', 'slug')}}" class="blog-entry-field">
         {% for tag in data.piece._tags|sort(false, true, 'slug') %}
         {# TODO: actually put query url in place #}
-            <a href="{{ data.page._url | build({ tags: tag.slug }) }}">{{tag.slug | replace("-", " ")}}</a><br>
+            <a href="{{ data.page._url | build({ tags: tag.slug }) }}">{{tag.slug | replace("tag-", "")}}</a><br>
             {% set tags = (tags.push(tag.slug), tags) %}
         {% endfor %}
         </div>
 
-        <div id="share-links-container"></div>
+        <div id="share-links-container" class="blog-entry-field"></div>
     </article>
 </div>
 
 <script type="application/javascript">
     window.ArticleSettings = {{ data.articleSettings | dump | safe }};
     window.ArticleSettings.moreUrl = "{{ data.page._url }}";
-    window.shareDiv = document.querySelector('#share-links-container');
 </script>
 <!-- <script src="{{ apos.asset.url('/modules/erf-apostrophe-blog-page/share-links.js') }}"></script> -->
 

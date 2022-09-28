@@ -2,7 +2,7 @@
 {% set category = data.piece._category[0] %}
 {% set author = data.piece._author[0] %}
 
-<meta property="article:published_time" content="{{data.piece.createdAt|date('YYYY-MM-DDTHH:MM:SSZ')}}" /> <!-- - datetime - When the article was first published.-->
+<meta property="article:published_time" content="{{data.piece.publishDate|date('YYYY-MM-DDTHH:MM:SSZ')}}" /> <!-- - datetime - When the article was first published.-->
 <meta property="article:modified_time" content="{{data.piece.updatedAt|date('YYYY-MM-DDTHH:MM:SSZ')}}" /> <!-- - datetime - When the article was last changed.-->
 <!-- TODO: include only if the author has a profile page -->
 {% if author and author.visibleOnListing and data.hasProfileActive %}

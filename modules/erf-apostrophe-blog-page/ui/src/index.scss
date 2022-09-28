@@ -1,4 +1,5 @@
-@import './variables.scss';
+@import './_variables.scss';
+@import '~flexboxgrid/css/flexboxgrid.min.css';
 
 .social-button {
     height: 3rem;
@@ -79,4 +80,15 @@
     }
 }
 
+article.entry > div#banner {
+    width: 100%;
+    > img {
+        max-width: 100%;
+    }
+}
 
+.article-layout .sticky {
+    position: sticky;
+    top: 0;
+    display: block;
+}
