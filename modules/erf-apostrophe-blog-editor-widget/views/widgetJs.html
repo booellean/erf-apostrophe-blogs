@@ -1,0 +1,13 @@
+{% set page = data.page %}
+{% set content = page.erf_main_content %}
+{% set user = data.user %}
+
+{% if (not user) and (content) and (content.items) %}
+    {% for item in content.items %}
+        {% if (item.content) and (item.content.js) %}
+        <script type="application/javascript">
+            {{ item.content.js | safe }}
+        </script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
