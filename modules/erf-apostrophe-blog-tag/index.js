@@ -3,6 +3,7 @@ module.exports = {
     options: {
         label: 'Blog Tag',
         name: 'erf-apostrophe-blog-tag',
+        slugPrefix: 'tag-',
         pluralLabel: 'Blog Tags',
         quickCreate: false,
         autopublish: true,

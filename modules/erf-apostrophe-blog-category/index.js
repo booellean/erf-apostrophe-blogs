@@ -3,6 +3,7 @@ module.exports = {
     options: {
         label: 'Blog Category',
         name: 'erf-apostrophe-blog-category',
+        slugPrefix: 'category-',
         pluralLabel: 'Blog Categories',
         quickCreate: false,
         autopublish: true,

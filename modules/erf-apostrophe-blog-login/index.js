@@ -8,14 +8,12 @@ module.exports = {
                     let image = ''
                     if(req.user.gravatarUrl){
                         image = req.user.gravatarUrl
-                    }else if(req.user._profileImage){
+                    }else if(req.user._profileImage && req.user._profileImage[0]){
                         let imageObj = self.apos.image.first(req.user._profileImage)
                         image = self.apos.attachment.url(imageObj, { size: 'one-third' })
                     }
 
-                    data.user.firstName = req.user.firstName
-                    data.user.lastName = req.user.lastName
-                    data.user.twitterHandle = req.user.twitterHandle
+                    data.user = req.user
                     data.user.profileImage = image
                 }
                 return data

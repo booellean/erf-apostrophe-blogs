@@ -76,14 +76,14 @@ module.exports = {
                   label: 'apostrophe:basics',
                   fields: [
                     'title',
-                    'allowNameSplit',
-                    'firstName',
-                    'lastName'
                   ]
                 },
                 profile: {
                   label: 'Profile (SEO)',
                   fields: [
+                    'allowNameSplit',
+                    'firstName',
+                    'lastName',
                     'twitterHandle',
                     'gravatarUrl',
                     '_profileImage',
@@ -108,7 +108,9 @@ module.exports = {
         return {
             beforeSave: {
                 async keepTwitterHandleStandard(req, doc){
+                  if(doc.twitterHandle){
                     doc.twitterHandle = doc.twitterHandle.replace(/@/g, "");
+                  }
                 }
             }
         }
