@@ -27,10 +27,6 @@ export default {
             }),
             header: this.$attrs.header
         }
-    },
-
-    mounted(){
-        console.log(this)
     }
 }
 </script>
