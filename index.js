@@ -12,7 +12,7 @@ module.exports = {
         alias: 'erf-blog-entry',
         label: 'Blog Entry',
         pluralLabel: 'Blog Entries',
-        autopublish: true,
+        autopublish: false,
         editRole: 'editor',
         publishRole: 'editor',
         quickCreate: true,
@@ -57,7 +57,7 @@ module.exports = {
                 required: true,
                 options: {
                     widgets: {
-                        'erf-apostrophe-grapesjs': {}
+                        'erf-apostrophe-blog-editor': {}
                     },
                     max: 1
                 }
@@ -89,6 +89,11 @@ module.exports = {
               withType: '@apostrophecms/user',
               max: 1,
               withRelationships: [ '_profileImage' ]
+            },
+            publishDate: {
+              type: 'dateAndTime',
+              label: 'Publish Date',
+              help: 'Leave blank to autosync when document is officially published.',
             }
         },
         group: {
@@ -99,19 +104,24 @@ module.exports = {
             ]
           },
           utility: {
-            fields: ['_author']
+            fields: ['_author', 'publishDate']
           }
         }
     },
     handlers(self){
       return{
         beforeSave: {
-          syncAuthor(req, doc, options) {
+          syncAuthor(req, doc) {
             if(doc._author.length < 1){
               doc._author =[req.user]
               doc.authorIds =[req.user.aposDocId]
               doc.authorFields = {}
               doc.authorFields[req.user.aposDocId] = {}
+            }
+          },
+          syncDate(req, doc){
+            if(!doc.publishDate && req.query.aposMode !== 'draft'){
+              doc.publishDate = new Date()
             }
           }
         }
