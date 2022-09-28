@@ -8,6 +8,13 @@
     "apostrophe": "^3.1.1"
   },
   "dependencies": {
-    "share-buttons": "^1.9.0"
+    "domino": "^2.1.6",
+    "flexboxgrid": "^6.3.1",
+    "googleapis": "^108.0.0",
+    "npm": "^8.19.1",
+    "page-metadata-parser": "^1.1.4",
+    "share-buttons": "^1.9.0",
+    "suneditor": "^2.43.14",
+    "vimeo": "^2.1.1"
   }
 }
