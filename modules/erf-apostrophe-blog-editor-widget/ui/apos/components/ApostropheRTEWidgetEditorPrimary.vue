@@ -5,7 +5,6 @@
 </template>
 
 <script>
-// import 'suneditor/dist/css/suneditor.min.css'
 import suneditor from 'suneditor'
 import plugins from 'suneditor/src/plugins'
 import config from 'erf-apostrophe-blogs/modules/erf-apostrophe-blog-editor-widget/helpers/config'
@@ -27,9 +26,7 @@ export default {
     },
     value: {
       type: Object,
-      default() {
-        return {};
-      }
+      default: () => {}
     },
     docId: {
       type: String,
@@ -48,35 +45,9 @@ export default {
     }
   },
   data() {
-    const FormData = new window.FormData()
-    FormData.append('file', null)
-
-    const docIcons = {
-      txt: 'file-text',
-      rtf: 'file-text',
-      docx: 'file-word-o ',
-      doc: 'file-word-o ',
-      dotx: 'file-word-o ',
-      xlsx : 'file-excel-o',
-      xlm : 'file-excel-o',
-      xls: 'file-excel-o',
-      xltx: 'file-excel-o',
-      csv: 'file-excel-o',
-      pdf: 'file-pdf-o ',
-      ppt: 'file-powerpoint-o ',
-      pptx: 'file-powerpoint-o ',
-      sldx: 'file-powerpoint-o ',
-      ppsx: 'file-powerpoint-o ',
-      potx: 'file-powerpoint-o ',
-      default: 'file',
-    }
-
     return {
-      docIcons: docIcons,
       loaded: false,
       pending: null,
-      formData: FormData,
-      file: null,
       widgetOptions: apos['blog-editor'].defaultOptions,
       moduleOptions: apos.modules[apos.area.widgetManagers[this.type]],
       editorToolbar: null,
@@ -93,6 +64,8 @@ export default {
     };
   },
   mounted(){
+
+    console.log('props', this.$props)
     
     // disable scroll on background body 
     if(!this.$props.isNotNested) document.body.style.overflow = 'hidden'
@@ -110,7 +83,7 @@ export default {
           console.log('opening...', core, targetElement)
           const rangeTag = core.util.createElement('div');
           core.util.addClass(rangeTag, '__se__format__range_custom');
-            // @Required
+          // @Required
           // Registering a namespace for caching as a plugin name in the context object
           core.context.customCommand = {
               targetButton: targetElement,
@@ -129,8 +102,15 @@ export default {
 
           result.forEach( image => {
             this.plugins.image.create_image.call(this, image.attachment._urls.full, null, '100%', 'auto', null, { name: image.title, size: image.attachment.length }, image.alt);
-             // TODO: set relationship of file id
+            // TODO: set relationship of file id
+
+            // Add a data tag to properly format when getting html
+            let imgTag = this.context.image._element;
+            console.log(JSON.stringify(image));
+            if(imgTag) imgTag.setAttribute('data-apos-doc', JSON.stringify(image))
+
           })
+
         }
       },
       {
@@ -198,10 +178,11 @@ export default {
             let anchor = {...this.context.anchor.caller.link, linkValue : window.location.origin + file._url, anchorText: { value: file.title }}
             anchor.downloadCheck.checked = true;
 
-            let linkHTML = this.plugins.anchor.createAnchor.call(this, anchor, false)
-            if(linkHTML) this.insertNode(linkHTML, null, true)
-
-            // TODO: set relationship of file id
+            let linkNode = this.plugins.anchor.createAnchor.call(this, anchor, false)
+            if(linkNode) {
+              linkNode.setAttribute('data-apos-doc', JSON.stringify(file))
+              this.insertNode(linkNode, null, true)
+            }
           })
         }
       }
@@ -227,14 +208,11 @@ export default {
           };
         },
         action: async () => {
-          // TODO: save first
-          this.$emit('close')
+          this.saveAndClose()
         }
       }
 
       customPlugins.push(save_plugin);
-
-      // let buttonSaves = config.buttonList.
     }
 
     this.editor = suneditor.create(this.$refs['se-blog-container'], {
@@ -248,8 +226,9 @@ export default {
     console.log('editor', this.editor);
 
     // // Must always be last one... Load the former Project Data
-    // if(this.$data.docFields.data.content && this.$data.docFields.data.content.projectData){
-    //   this.editor.loadProjectData(this.$data.docFields.data.content.projectData)
+    // if(this.$data.docFields.data.items && this.$data.docFields.data.items.projectData){
+    //   // TODO: Fix
+    //   this.editor.setContents(//contents)
     // }
 
     this.loaded = true;
@@ -297,102 +276,69 @@ export default {
         this.pending = null;
       }
       const widget = this.docFields.data;
-      // widget.images = deepArrayAssign(widget.content.projectData.pages[0].frames[0].component.components, 'picture')
-      // widget.files = deepArrayAssign(widget.content.projectData.pages[0].frames[0].component.components, 'file')
+      // widget.images = deepArrayAssign(widget.items.projectData.pages[0].frames[0].component.components, 'picture')
+      // widget.files = deepArrayAssign(widget.items.projectData.pages[0].frames[0].component.components, 'file')
       // ... removes need for deep watching in parent
       this.$emit('update', widget);
     },
-    stripBodyTag(html) {
-      return html.replace(/(<([body]+)>)/ig, '');
+    saveAndClose(){
+      this.assignValue()
+
+      // Save our relationships
+      // Close
+      this.$emit('close')
     },
-    async updatePage(page){
-      // if(this.currentPage !== page){
-      //   this.currentPage = page;
-      //   for(let i = 0; i < this.results.length; i++){
-      //     this.editor.AssetManager.remove(this.results[i].src)
-      //   }
+    assignValue(){
 
-      //   await this.getAssetDocuments();
-      //   return this.editor.AssetManager.add(this.results)
-      // }
-      
-    },
-    handleClose() {
-      // this.editor.AssetManager.clear()
-      // this.handleUpdate();
-    },
-    async handleOpen() {
-      // let apiUrl = this.editor.AssetManager.assetType === 'image'
-      //   ? this.imgApiUrl
-      //   : this.fileApiUrl
+      let regex = /:?(<img[^>]+data\-apos\-doc.+?>|<[a-zA-Z][^>]+data\-apos\-doc.*?<\/[a-zA-Z]>)/gm
+      // Get array of html strings
+      let htmlArray = this.editor.getContents().split(regex)
 
-      // if(this.editor.AssetManager.assetType !== 'image') this.editor.Modal.setTitle('Select File')
+      // convert to a node array for apostrophe
+      let nodeArray = htmlArray.map( string => {
 
-      // // We are opening up a different asset type. Let's reset our values for pagination and assets
-      // if(apiUrl !== this.apiUrl){
-      //   this.apiUrl = apiUrl;
-      //   this.currentPage = 1
-      //   this.totalPages = null
-      //   this.results = []
-      //   if(this.paginationFooter){
-      //     this.paginationFooter.parentNode.removeChild(this.paginationFooter)
-      //     this.paginationFooter = null
-      //   }
+        if(string.match(regex)){
 
-      //   await this.getAssetDocuments();
+          let parent = document.createElement('div')
+          parent.innerHTML = string
+          let node = parent.firstChild
+          let docString = node.getAttribute('data-apos-doc')
+          node.removeAttribute('data-apos-doc')
+          node.removeAttribute('src')
+          node.removeAttribute('href')
+          node.removeAttribute('alt')
 
-      //   const mediaContainer = document.querySelector('div.gjs-am-assets-cont')
-      //   if(mediaContainer && this.totalPages > 1 && !this.paginationFooter){
-      //     mediaContainer.classList.add('gjs-flex-asset-column')
-      //     this.paginationFooter = document.createElement('nav')
-      //     this.paginationFooter.id = 'erf-grapesjs-paginate'
-      //     this.paginationFooter.className = 'gjs-erf-asset-pagination-footer'
-      //     mediaContainer.appendChild(this.paginationFooter)
-      //     new Pagination(this.updatePage, this.paginationFooter, this.currentPage, this.totalPages, 5)
-      //   }
-      // }
+          let attrs = node.getAttributeNames().map( name => `${name}=${node.getAttribute(name)}`)
 
-      // // Set our url for getting and posting assets
-      // return this.editor.AssetManager.add(this.results);
+          // Format to a functional JSON object
+          let aposData = JSON.parse(docString)
+          let name = aposData.type.split('/')[1]
+          let idName = `${name}Ids`
+          let fieldName = `${name}Fields`
+          aposData.attributes = attrs
 
-    },
-    async getAssetDocuments(){
-      // // Now get those assets from the backend
-      // const media = await apos.http.get(this.apiUrl, {
-      //   busy: true,
-      //   qs : {
-      //     page: this.currentPage
-      //   },
-      //   draft: true
-      // })
+          let returnObj = {
+            attributes : attrs,
+            metaType: 'widget',
+            type: aposData.type,
+            [idName] : [ aposData.aposDocId ],
+            [fieldName] : { [aposData.aposDocId] : {} }
+          }
 
-      // if(media.results && media.results.length > 0){
-      //   this.totalPages = media.pages
-      //   this.currentPage = media.currentPage
+          // returnObj[] = [ aposData.aposDocId ],
+          // returnObj[] = { `${aposData.aposDocId}` : {} }
 
-      //   if(this.editor.AssetManager.assetType === 'image'){
-      //     this.results = media.results.map( result => {
-      //       return {
-      //         ...result,
-      //         type: 'picture',
-      //         name: result.title,
-      //         src: result.attachment._urls['one-third'],
-      //         width: result.attachment.width,
-      //         height: result.attachment.height,
-      //       }
-      //     });
-      //   }else{
-      //     this.results = media.results.map( result => {
-      //       return {
-      //         ...result,
-      //         name: result.title,
-      //         href: result._url,
-      //         type: 'file',
-      //         src: this.docIcons[result.attachment.extension] || this.docIcons.default
-      //       }
-      //     });
-      //   }
-      // }
+          return returnObj
+
+        }
+
+        return string;
+
+      })
+
+      this.docFields.data.items = nodeArray
+
+      this.editorUpdate()
     },
     formatBodyPosition(){
       if(this.editorToolbar && this.editorBody){

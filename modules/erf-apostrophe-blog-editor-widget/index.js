@@ -80,11 +80,8 @@ module.exports = {
         ],
         // contentDetails,id,liveStreamingDetails,localizations,player,recordingDetails,snippet,statistics,status,topicDetails
         defaultData: {
-          images: [],
-          files: [],
-          content: {
-            html: '',
-          }
+          metaType: 'area',
+          items: []
         },
         plugins: [
           'video',
@@ -129,13 +126,8 @@ module.exports = {
     },
     methods(self) {
         return {
-          // Return just the rich text of the widget, which may be undefined or null if it has not yet been edited
-          getRichText(widget) {
-            return widget.content;
-          },
-    
-          async load(req, widgets) {
-          },
+          // async load(req, widgets) {
+          // },
 
           removeScripts(content){
             // TODO: remove scripts
@@ -157,8 +149,6 @@ module.exports = {
               self.getComponentName('videoEmbedModal', 'ApostropheRTEVideoEmbedManager'),
               {
                 pluginSettings: self.options.pluginSettings.video ? self.options.pluginSettings.video : {}
-                // moduleName: self.__meta.name,
-                // saveRoute: '/v1/api/erf-apostrophe-blog-page/settings'
               } 
             );
           },
@@ -187,6 +177,7 @@ module.exports = {
             ...initialData,
             defaultOptions: self.options.defaultOptions
           };
+          // console.log('widget', finalData)
           return finalData;
         }
       };
