@@ -223,6 +223,28 @@ export default {
       ...(config(!this.$props.isNotNested))
     })
 
+    if(
+      this.$data.docFields.data &&
+      this.$data.docFields.data.items &&
+      this.$data.docFields.data.items.length > 0
+    ) {
+      this.editor.setContents(
+        this.$data.docFields.data.items.map( item => {
+          if( typeof item === 'object'){
+            return ''
+
+            if(item._image){
+            }
+            
+            if(item._file){
+            }
+          }
+          return item
+        })
+        .join('')
+      )
+    }
+
     console.log('editor', this.editor);
 
     // // Must always be last one... Load the former Project Data
@@ -319,7 +341,7 @@ export default {
 
           let returnObj = {
             attributes : attrs,
-            metaType: 'widget',
+            // metaType: 'widget',
             type: aposData.type,
             [idName] : [ aposData.aposDocId ],
             [fieldName] : { [aposData.aposDocId] : {} }

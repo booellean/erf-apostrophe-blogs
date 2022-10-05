@@ -17,9 +17,6 @@
     {% if item is string %}
       {{ item | safe }}
     {% endif %}
-    {% if item.type is defined %}
-      {{ item | dump }}
-    {% endif %}
 
     {% if item.type is defined %}
 
@@ -35,6 +32,8 @@
       {% endif %}
 
       {% if item.type == '@apostrophecms/file' %}
+        {% set attachment = apos.attachment.first(item) %}
+        {{ attachment | dump }}
         A file will go here
       {% endif %}
 

@@ -1,0 +1,22 @@
+{% if data.options.className %}
+  {% set className = data.options.className %}
+{% elif data.manager.options.className %}
+  {% set className = data.manager.options.className %}
+{% endif %}
+
+{% if data.options.dimensionAttrs %}
+  {% set dimensionAttrs = data.options.dimensionAttrs %}
+{% elif data.manager.options.dimensionAttrs  %}
+  {% set dimensionAttrs = data.manager.options.dimensionAttrs  %}
+{% endif %}
+
+{% set attachment = apos.attachment.first(data.widget._file) %}
+
+{% if attachment %}
+  <a {% if className %} class="{{ className }}"{% endif %}
+    href="{{ apos.attachment.url(attachment) }}"
+    download="{{ attachment.name }}.{{ attachment.extension }}"
+  >
+    {{ data.widget._file.title }}
+  </a>
+{% endif %}

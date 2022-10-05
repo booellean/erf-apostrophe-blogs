@@ -8,20 +8,20 @@ module.exports = {
     //   directory: 'modules',
     //   modules: getBundleModuleNames()
     // },
-    fields: {
-      add: {
-        _images:{
-          label: 'Images',
-          type: 'relationship',
-          withType: '@apostrophecms/image'
-        },
-        _files:{
-          label: 'Files',
-          type: 'relationship',
-          withType: '@apostrophecms/file'
-        },
-      }
-    },
+    // fields: {
+    //   add: {
+    //     _images:{
+    //       label: 'Images',
+    //       type: 'relationship',
+    //       withType: '@apostrophecms/image'
+    //     },
+    //     _files:{
+    //       label: 'Files',
+    //       type: 'relationship',
+    //       withType: '@apostrophecms/file'
+    //     },
+    //   }
+    // },
     components(self) {
       return {
         async widgetCss(req, data) {},
