@@ -6,19 +6,46 @@
 {% set user = data.user %}
 {% set edit = data.user._edit %}
 
-{% if (user) and (edit) %}
+{# {% if (user) and (edit) %}
 <style type="text/css">
   {{ data.widget.content.css | safe }}
 </style>
-{% endif %}
+{% endif %} #}
 
 <div data-blog-editor-widget {% if className %} class="{{ className }}" {% endif %} id="blog-post">
-  {{ data.widget.content.html | safe }}
+  {% for item in data.widget.items %}
+    {% if item is string %}
+      {{ item | safe }}
+    {% endif %}
+    {% if item.type is defined %}
+      {{ item | dump }}
+    {% endif %}
+
+    {% if item.type is defined %}
+
+      {% if item.type == '@apostrophecms/image' %}
+        {% set attachment = apos.image.first(item) %}
+        {% set srcset = apos.image.srcset(attachment) %}
+        {% set src = apos.attachment.url(attachment) %}
+        <img
+          srcset="{{ srcset }}"
+          src="{{ src }}"
+          alt="{{ attachment.alt }}"
+        >
+      {% endif %}
+
+      {% if item.type == '@apostrophecms/file' %}
+        A file will go here
+      {% endif %}
+
+    {% endif %}
+
+  {% endfor %}
 </div>
 
-{% if (user) and (edit) %}
+{# {% if (user) and (edit) %}
 <script type="application/javascript">
   {{ data.widget.content.js | safe }}
 </script>
-{% endif %}
+{% endif %} #}
 
