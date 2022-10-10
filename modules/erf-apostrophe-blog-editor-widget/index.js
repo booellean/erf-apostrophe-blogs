@@ -4,24 +4,6 @@ const path = require('path');
 
 module.exports = {
     extend: '@apostrophecms/widget-type',
-    // bundle: {
-    //   directory: 'modules',
-    //   modules: getBundleModuleNames()
-    // },
-    // fields: {
-    //   add: {
-    //     _images:{
-    //       label: 'Images',
-    //       type: 'relationship',
-    //       withType: '@apostrophecms/image'
-    //     },
-    //     _files:{
-    //       label: 'Files',
-    //       type: 'relationship',
-    //       withType: '@apostrophecms/file'
-    //     },
-    //   }
-    // },
     components(self) {
       return {
         async widgetCss(req, data) {},

@@ -21,20 +21,36 @@
     {% if item.type is defined %}
 
       {% if item.type == '@apostrophecms/image' %}
+
         {% set attachment = apos.image.first(item) %}
         {% set srcset = apos.image.srcset(attachment) %}
         {% set src = apos.attachment.url(attachment) %}
+
         <img
           srcset="{{ srcset }}"
           src="{{ src }}"
           alt="{{ attachment.alt }}"
+          {% if item.attributes %} 
+            {% for attributeArr in item.attributes %}
+              {{ attributeArr[0] }}="{{ attributeArr[1] }}"
+            {% endfor %}
+          {% endif %}
         >
       {% endif %}
 
-      {% if item.type == '@apostrophecms/file' %}
+      {% if item.type == 'erf-file' %}
         {% set attachment = apos.attachment.first(item) %}
-        {{ attachment | dump }}
-        A file will go here
+
+        <a {% if item.attributes %} 
+            {% for attributeArr in item.attributes %}
+              {{ attributeArr[0] }}="{{ attributeArr[1] }}"
+            {% endfor %}
+          {% endif %}
+          href="{{ apos.attachment.url(attachment) }}"
+          download="{{ attachment.name | trim }}.{{ attachment.extension | trim }}"
+        >
+          {{ item._file[0].title }}
+        </a>
       {% endif %}
 
     {% endif %}

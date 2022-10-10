@@ -1,6 +1,6 @@
 <template>
     <div :class="'se-main-content-wrapper' + (isNotNested ? '' : ' se-modal')">
-      <textarea  ref="se-blog-container" class="se-blog-editor-container"></textarea>
+      <textarea  ref="se-blog-container" class="se-blog-editor-container" v-model="htmlString"></textarea>
   </div>
 </template>
 
@@ -60,6 +60,7 @@ export default {
         },
         hasErrors: false
       },
+      htmlString: this.formatItemToHtmlString(this.$props.value.items),
       editor: null,
     };
   },
@@ -106,8 +107,7 @@ export default {
 
             // Add a data tag to properly format when getting html
             let imgTag = this.context.image._element;
-            console.log(JSON.stringify(image));
-            if(imgTag) imgTag.setAttribute('data-apos-doc', JSON.stringify(image))
+            if(imgTag) imgTag.setAttribute('data-apos-doc', image.aposDocId)
 
           })
 
@@ -180,7 +180,7 @@ export default {
 
             let linkNode = this.plugins.anchor.createAnchor.call(this, anchor, false)
             if(linkNode) {
-              linkNode.setAttribute('data-apos-doc', JSON.stringify(file))
+              linkNode.setAttribute('data-apos-doc', file.aposDocId)
               this.insertNode(linkNode, null, true)
             }
           })
@@ -223,35 +223,10 @@ export default {
       ...(config(!this.$props.isNotNested))
     })
 
-    if(
-      this.$data.docFields.data &&
-      this.$data.docFields.data.items &&
-      this.$data.docFields.data.items.length > 0
-    ) {
-      this.editor.setContents(
-        this.$data.docFields.data.items.map( item => {
-          if( typeof item === 'object'){
-            return ''
-
-            if(item._image){
-            }
-            
-            if(item._file){
-            }
-          }
-          return item
-        })
-        .join('')
-      )
+    this.editor.onChange = (contents, core) =>{
+      this.htmlString = contents
+      this.assignValue()
     }
-
-    console.log('editor', this.editor);
-
-    // // Must always be last one... Load the former Project Data
-    // if(this.$data.docFields.data.items && this.$data.docFields.data.items.projectData){
-    //   // TODO: Fix
-    //   this.editor.setContents(//contents)
-    // }
 
     this.loaded = true;
 
@@ -274,6 +249,41 @@ export default {
   },
 
   methods: {
+    formatItemToHtmlString(items) {
+      return items.map( item => {
+        if( typeof item === 'object'){
+
+          if(item._image){
+            return `<img
+              src="${item._image[0].attachment._urls.full}"
+              alt="${item._image[0].alt}"
+              data-apos-doc="${item._image[0].aposDocId}"
+              ${item.attributes && item.attributes.length > 0
+                ? item.attributes.map( attr => `${attr[0]}="${attr[1]}"`).join(' ')
+                : ''
+              }
+            />`
+          }
+          
+          if(item._file){
+            return `<a
+              href="${item._file[0]._url}"
+              download="${item._file[0].title}"
+              data-apos-doc="${item._file[0].aposDocId}"
+              ${item.attributes && item.attributes.length > 0
+                ? item.attributes.map( attr => `${attr[0]}="${attr[1]}"`).join(' ')
+                : ''
+              }
+              >
+                ${item._file[0].title}
+              </a>`
+          }
+
+        }
+        return item
+      })
+      .join('')
+    },
     async editorUpdate() {
       // Hint that we are typing, even though we're going to
       // debounce the actual updates for performance
@@ -314,7 +324,7 @@ export default {
 
       let regex = /:?(<img[^>]+data\-apos\-doc.+?>|<[a-zA-Z][^>]+data\-apos\-doc.*?<\/[a-zA-Z]>)/gm
       // Get array of html strings
-      let htmlArray = this.editor.getContents().split(regex)
+      let htmlArray = this.htmlString.split(regex)
 
       // convert to a node array for apostrophe
       let nodeArray = htmlArray.map( string => {
@@ -324,31 +334,27 @@ export default {
           let parent = document.createElement('div')
           parent.innerHTML = string
           let node = parent.firstChild
-          let docString = node.getAttribute('data-apos-doc')
+          let aposDocId = node.getAttribute('data-apos-doc')
           node.removeAttribute('data-apos-doc')
           node.removeAttribute('src')
           node.removeAttribute('href')
+          node.removeAttribute('download')
           node.removeAttribute('alt')
 
-          let attrs = node.getAttributeNames().map( name => `${name}=${node.getAttribute(name)}`)
+          let attrs = node.getAttributeNames().map( name => [name, node.getAttribute(name)])
 
           // Format to a functional JSON object
-          let aposData = JSON.parse(docString)
-          let name = aposData.type.split('/')[1]
+          let name = node.nodeName.toLowerCase() === 'img' ? 'image' : 'file'
           let idName = `${name}Ids`
           let fieldName = `${name}Fields`
-          aposData.attributes = attrs
 
           let returnObj = {
             attributes : attrs,
             // metaType: 'widget',
-            type: aposData.type,
-            [idName] : [ aposData.aposDocId ],
-            [fieldName] : { [aposData.aposDocId] : {} }
+            type: name === 'image' ? '@apostrophecms/image' : 'erf-file',
+            [idName] : [ aposDocId ],
+            [fieldName] : { [aposDocId] : {} }
           }
-
-          // returnObj[] = [ aposData.aposDocId ],
-          // returnObj[] = { `${aposData.aposDocId}` : {} }
 
           return returnObj
 
@@ -357,6 +363,8 @@ export default {
         return string;
 
       })
+
+      console.log('nodeArray', nodeArray)
 
       this.docFields.data.items = nodeArray
 
@@ -367,27 +375,6 @@ export default {
         let offset = this.editorToolbar.scrollHeight
         this.editorBody.style.marginTop = (offset-60)+'px'
       }
-    },
-    b64toFile(b64Data, contentType, filename = 'file-edit', sliceSize = 512) {
-      let byteCharacters = atob(b64Data);
-      let byteArrays = [];
-      let ext = contentType.split('/').pop()
-
-      for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-        let slice = byteCharacters.slice(offset, offset + sliceSize);
-
-        let byteNumbers = new Array(slice.length);
-        for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-        }
-
-        let byteArray = new Uint8Array(byteNumbers);
-
-        byteArrays.push(byteArray);
-      }
-
-      const blob = new Blob(byteArrays, {type: contentType});
-      return new File([blob], `${filename}.${ext}`, { type : contentType, size: 2 });
     }
   }
 };
